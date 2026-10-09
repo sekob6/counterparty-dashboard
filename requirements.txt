@@ -1,0 +1,6 @@
+streamlit>=1.30
+pandas
+openpyxl
+bcrypt
+psycopg2-binary
+supabase
