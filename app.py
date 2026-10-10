@@ -1,3 +1,15 @@
+# =========================================================
+#  НАСТРОЙКИ STREAMLIT (должны быть ДО import streamlit!)
+#  Отключаем XSRF/CORS — Layero не всегда пропускает WebSocket
+# =========================================================
+import os
+os.environ["STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION"] = "false"
+os.environ["STREAMLIT_SERVER_ENABLE_CORS"] = "false"
+os.environ["STREAMLIT_SERVER_HEADLESS"] = "true"
+os.environ["STREAMLIT_BROWSER_GATHER_USAGE_STATS"] = "false"
+os.environ["STREAMLIT_SERVER_ADDRESS"] = "0.0.0.0"
+os.environ["STREAMLIT_SERVER_PORT"] = os.environ.get("PORT", "8501")
+
 import streamlit as st
 import pandas as pd
 import bcrypt
@@ -7,7 +19,6 @@ from supabase import create_client, Client
 import io
 import uuid
 import mimetypes
-import os
 from datetime import datetime
 from pathlib import Path
 
@@ -276,8 +287,6 @@ def get_supabase() -> Client:
 
 # =========================================================
 #  ПРОВЕРКА АДМИНА
-#  Таблицы уже созданы вручную через SQL Editor Supabase,
-#  поэтому здесь только проверяем наличие стартового admin.
 # =========================================================
 def ensure_admin():
     try:
