@@ -4,3 +4,4 @@ openpyxl
 bcrypt
 psycopg2-binary
 supabase
+python-dotenv

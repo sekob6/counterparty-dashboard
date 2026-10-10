@@ -7,6 +7,7 @@ from supabase import create_client, Client
 import io
 import uuid
 import mimetypes
+import os
 from datetime import datetime
 from pathlib import Path
 
@@ -19,27 +20,26 @@ st.set_page_config(
 
 # =========================================================
 #  СЕКРЕТЫ (Supabase)
+#  Приоритет: переменные окружения -> st.secrets (для локалки)
 # =========================================================
-try:
-    DB_URL    = st.secrets["supabase"]["db_url"]
-    SUPA_URL  = st.secrets["supabase"]["url"]
-    SUPA_KEY  = st.secrets["supabase"]["key"]
-    BUCKET    = st.secrets["supabase"].get("bucket", "attachments")
-except (KeyError, FileNotFoundError):
-    st.error(
-        "⚠️ Не настроены секреты Supabase.\n\n"
-        "Создайте файл `.streamlit/secrets.toml` в папке проекта (шаблон — ниже) "
-        "или добавьте секреты в настройках Streamlit Cloud."
-    )
-    st.code(
-        '[supabase]\n'
-        'db_url = "postgresql://postgres:ПАРОЛЬ@db.ПРОЕКТ.supabase.co:5432/postgres"\n'
-        'url    = "https://ПРОЕКТ.supabase.co"\n'
-        'key    = "SERVICE_ROLE_KEY"\n'
-        'bucket = "attachments"\n',
-        language="toml"
-    )
-    st.stop()
+DB_URL    = os.environ.get("SUPABASE_DB_URL")
+SUPA_URL  = os.environ.get("SUPABASE_URL")
+SUPA_KEY  = os.environ.get("SUPABASE_KEY")
+BUCKET    = os.environ.get("SUPABASE_BUCKET", "attachments")
+
+if not all([DB_URL, SUPA_URL, SUPA_KEY]):
+    try:
+        DB_URL   = st.secrets["supabase"]["db_url"]
+        SUPA_URL = st.secrets["supabase"]["url"]
+        SUPA_KEY = st.secrets["supabase"]["key"]
+        BUCKET   = st.secrets["supabase"].get("bucket", "attachments")
+    except Exception:
+        st.error(
+            "⚠️ Не настроены секреты Supabase.\n\n"
+            "Для облака задайте переменные окружения: SUPABASE_DB_URL, SUPABASE_URL, SUPABASE_KEY, SUPABASE_BUCKET.\n"
+            "Для локального запуска — создайте файл `.streamlit/secrets.toml`."
+        )
+        st.stop()
 
 # =========================================================
 #  КАСТОМНАЯ ТЕМА
